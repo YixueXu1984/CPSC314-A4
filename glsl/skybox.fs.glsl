@@ -1,9 +1,14 @@
 #version 300 es
 
-out vec4 out_FragColor;
+uniform samplerCube sb;
 
-uniform samplerCube skybox;
+out vec4 out_FragColor;
+in vec3 sbpos;
 
 void main() {
-	out_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+    vec3 p = normalize(sbpos);
+    vec4 textureColor = texture(sb, p);
+
+	out_FragColor = textureColor;
 }

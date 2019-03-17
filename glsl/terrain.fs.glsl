@@ -26,20 +26,35 @@ void main() {
 
 	// PRE-CALCS
 	vec3 Ni = normalize(vcsNormal);
-	vec3 L = normalize(vec3(viewMatrix * vec4(lightDirection, 0.0)));
-	vec3 V = normalize(-vcsPosition);
+
+	vec3 up = vec3(0.0, 1.0, 0.0);
+	vec3 T = normalize(cross(Ni, up));
+	vec3 B = cross(Ni, T);
+
+	mat3 TBN_matrix = mat3(
+		vec3(T.x, B.x, Ni.x),
+		vec3(T.y, B.y, Ni.y),
+		vec3(T.z, B.z, Ni.z)
+	);
+
+	vec3 L = normalize(vec3(viewMatrix * vec4(lightDirection, 0.0))) * TBN_matrix;
+	vec3 V = normalize(-vcsPosition) * TBN_matrix;
 	vec3 H = normalize((V + L) * 0.5);
 
+	//texture
+	vec4 textureColor = texture(colorMap, vcsTexcoord);
+	vec4 textureAmb = texture(aoMap, vcsTexcoord);
+
 	//AMBIENT
-	vec3 light_AMB = ambientColor * kAmbient;
+	vec3 light_AMB = ambientColor * kAmbient * textureAmb.xyz;
 
 	//DIFFUSE
 	vec3 diffuse = kDiffuse * lightColor;
-	vec3 light_DFF = diffuse * max(0.0, dot(Ni, L));
+	vec3 light_DFF = diffuse * max(0.0, dot(Nt, L)) * textureColor.xyz;
 
 	//SPECULAR
 	vec3 specular = kSpecular * lightColor;
-	vec3 light_SPC = specular * pow(max(0.0, dot(H, Ni)), shininess);
+	vec3 light_SPC = specular * pow(max(0.0, dot(H, Nt)), shininess);
 
 	//TOTAL
 	vec3 TOTAL = light_AMB + light_DFF  + light_SPC;

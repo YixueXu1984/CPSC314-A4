@@ -159,13 +159,22 @@ var terrainMaterial = new THREE.ShaderMaterial({
 });
 
 // Skybox texture
+
 // TODO: set up the texture for skybox
-var skyboxCubemap = new THREE.CubeTextureLoader();
+var skyboxCubemap = new THREE.CubeTextureLoader().load([
+    'images/negx.png', 'images/posx.png', 'images/posy.png',
+    'images/negy.png', 'images/posz.png', 'images/negz.png'
+]);
 skyboxCubemap.format = THREE.RGBFormat;
 
 
 // TODO: set up the material for skybox
-var skyboxMaterial = new THREE.ShaderMaterial({ });
+var skyboxMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+        sb: {type: "t", value: skyboxCubemap}
+    },
+    side: THREE.DoubleSide
+});
 
 var armadilloMaterial = new THREE.ShaderMaterial({
   uniforms: {
@@ -222,9 +231,9 @@ new THREE.SourceLoader().load(shaderFiles, function(shaders) {
   envmapMaterial.fragmentShader = shaders['glsl/envmap.fs.glsl'];
 });
 
-// var ctx = renderer.context;
+ var ctx = renderer.context;
 // stops shader warnings, seen in some browsers
-// ctx.getShaderInfoLog = function () { return '' };
+ ctx.getShaderInfoLog = function () { return '' };
 
 // Adding objects
 // LOAD OBJ ROUTINE
