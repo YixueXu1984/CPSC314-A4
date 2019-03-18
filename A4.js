@@ -191,7 +191,10 @@ var armadilloMaterial = new THREE.ShaderMaterial({
 
 
 // TODO: set up the material for environment mapping
-var envmapMaterial = new THREE.ShaderMaterial({ });
+var envmapMaterial = new THREE.ShaderMaterial({
+    lightDirection: lightDirectionUniform,
+    sb: {type: "t", value: skyboxCubemap}
+});
 
 // Load shaders
 var shaderFiles = [
