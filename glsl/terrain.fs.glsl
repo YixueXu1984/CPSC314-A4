@@ -5,6 +5,8 @@ out vec4 out_FragColor;
 in vec3 vcsNormal;
 in vec3 vcsPosition;
 in vec2 vcsTexcoord;
+in vec4 shadowCoord;
+
 
 uniform vec3 lightColor;
 uniform vec3 ambientColor;
@@ -20,7 +22,10 @@ uniform sampler2D normalMap;
 uniform sampler2D aoMap;
 uniform sampler2D shadowMap;
 
+
 void main() {
+
+
 	// TANGENT SPACE NORMAL
 	vec3 Nt = normalize(texture(normalMap, vcsTexcoord).xyz * 2.0 - 1.0);
 
@@ -59,5 +64,15 @@ void main() {
 	//TOTAL
 	vec3 TOTAL = light_AMB + light_DFF  + light_SPC;
 
-	out_FragColor = vec4(TOTAL, 1.0);
+	// shadow
+	vec3 sc = shadowCoord.xyz / shadowCoord.w;
+	sc = sc * 0.5 + 0.5;
+	float closestDpeth = texture(shadowMap, sc.xy).r;
+	float currentDepth = sc.z;
+    float visibility = 1.0;
+
+if ( closestDpeth < currentDepth){
+    visibility = 0.5;
+}
+	out_FragColor = vec4(TOTAL*visibility, 1.0);
 }

@@ -47,11 +47,13 @@ var lightDirection = new THREE.Vector3(0.49,0.79,0.49);
 // TODO: change the shadowMap_camera for scene that creates shadow map
 var shadowMapWidth = 10;
 var shadowMapHeight = 10;
-var shadowMap_Camera = new THREE.OrthographicCamera(1, 1, 1, 1, 1, 1000);
+var shadowMap_Camera = new THREE.OrthographicCamera(shadowMapWidth/ - 2, shadowMapWidth / 2, shadowMapHeight / 2, shadowMapHeight / -2, 1, 1000);
 
 
 // TODO: set the camera's lookAt and then add at it to the scene
 shadowMap_Camera.position.set(10.0, 10.0, 10.0);
+shadowMap_Camera.lookAt(new THREE.Vector3(shadowMap_Camera.position - lightDirection));
+depthScene.add(shadowMap_Camera);
 
 
 // Main camera
@@ -100,6 +102,8 @@ finalScene.add(worldFrame);
 
 // texture containing the depth values from the shadowMap_Camera POV
 // TODO: create the depthTexture associating with this RenderTarget
+var shadowMapWidth = window.innerWidth;
+var shadowMapHeight = window.innerHeight;
 var shadowMap = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
 
 
@@ -114,6 +118,8 @@ normalMap.anisotropy = renderer.capabilities.getMaxAnisotropy();
 var aoMap = new THREE.TextureLoader().load('images/ambient_occlusion.png');
 aoMap.minFilter = THREE.LinearFilter;
 aoMap.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+shadowMap.minFilter = THREE.LinearFilter;
 
 // TODO: load texture for environment mapping
 
@@ -154,7 +160,9 @@ var terrainMaterial = new THREE.ShaderMaterial({
     colorMap: { type: "t", value: colorMap },
     normalMap: { type: "t", value: normalMap },
     aoMap: { type: "t", value: aoMap },
-    shadowMap: { type: "t", value: shadowMap.depthTexture }
+    shadowMap: { type: "t", value: shadowMap.depthTexture},
+      lightViewMatrixUniform: lightViewMatrixUniform,
+      lightProjectMatrixUniform: lightProjectMatrixUniform
   }
 });
 
